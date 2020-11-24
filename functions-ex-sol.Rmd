@@ -1,0 +1,123 @@
+## Faszinierend funkelnd funktional -funzen muss es halt!
+
+Lesen Sie das ["Functions"](http://adv-r.had.co.nz/Functions.html)-Kapitel aus dem *Advanced R Programming*-Buch von Hadley Wickham aufmerksam durch.
+
+Bearbeiten Sie die folgenden von dort übernommenen Aufgaben:
+
+a)  Schreiben Sie die folgenden verwirrenden Funktionsaufrufe so um dass sie möglichst klar & einfach zu verstehen sind:
+
+```{r, 1a, eval=FALSE}
+set.seed(20141012)
+random_sample <- sample(x = c(1:10, NA), size = 20, replace = TRUE)
+random_deviates <- runif(n = 20, min = 0, max = 1)
+cor(
+  x = random_sample,
+  y = random_deviates,
+  use = "pairwise.complete.obs",
+  method = "kendall"
+)
+```
+
+b)  Was gibt diese Funktion zurück? Warum? Welches Prinzip illustriert sie?
+
+```{r, 1b, eval=FALSE}
+f1 <- function(x =
+                 {
+                   y <- 1
+                   2
+                 },
+               y = 0)
+{
+  x + y
+}
+f1()
+```
+
+*Hinweis:* Was passiert wenn Sie die letzte Zeile mit `y + x` ersetzen? Mit `c(y, x, y)`?
+
+3 wird zurückgegeben.
+
+Um x + y auszuführen wird die Zuweisung für x in der Argumentenliste durchgeführt.
+Dabei wird y den Wert 1 zugewiesen. Da es einen Wert für y gibt, wird die Zuweisung 
+in der Argumentenliste y = 0 nicht durchgeführt.
+
+Wenn y + x steht, wird zuerst nach dem Wert für y gesehen. Die Zuweisung y = 0
+erfolgt. Dann wird nach dem Wert für x gesehen und dabei die Zuweisung y <- 1 
+durchgeführt. Für die Summe hat die neue Wertzuweisung für y keine Bedeutung,
+da R sich den Wert für y bereits "gemerkt" hat.
+Die Änderung ist jedoch bei c(y, x, y) ersichtlich, da hier y noch einmal aufgerufen 
+wird. Hier wird auf den aktualisierten Wert von y zugegriffen.
+
+Prinzip: lazy evaluation
+
+c)  Was gibt diese Funktion zurück? Warum? Welches Prinzip illustriert sie?
+
+```{r, 1c, eval=FALSE}
+f2 <- function(x = z) {
+  z <- 100
+  x
+}
+f2()
+```
+
+100 wird zurückgegeben.
+
+Die Zuweisung von x geschieht erst, wenn x in der Funktion aufgerufen wird,
+also in der letzten Zeile.
+
+Prinzip: lazy evaluation
+
+d)  Schreiben sie eine *infix*-Funktion `%xor%` für `logical`-inputs die eine XOR-Operation (entweder-oder-aber-nicht-beides) durchführt. Überprüfen Sie ihre Funktion mit den folgenden Tests:
+
+```{r, code = readLines("test-functions-xor.R"), eval=FALSE}
+```
+
+```{r, 1d, eval=FALSE}
+`%xor%` <- function(logical_1, logical_2) {
+  (logical_1 | logical_2) & !(logical_1 & logical_2)
+}
+```
+
+e)  Wie kann jeweils der Zustand von `options()` und `par()` abgespeichert und wiederhergestellt werden?
+
+Am Anfang der Funktion werden die aktuellen Einstellungen gespeichert und 
+durch on.exit() sichergestellt, dass diese wiederhergestellt werden.
+
+old_options <- options(no.readonly = TRUE)
+
+old_par <- par(no.readonly = TRUE)
+
+on.exit(options(old_options))
+
+on.exit(par(old_par))
+
+f)  Schreiben Sie eine Funktion die ein neues PDF-Grafikdevice öffnet, `plot` mit den übergebenen Argumenten aufruft und dann das zuvor geöffnete Grafikfenster wieder schließt, egal ob die übergebenen Argumente für `plot` funktioniert haben oder nicht.
+
+```{r, 1f, eval=FALSE}
+plot_in_pdf <- function(...) {
+  on.exit(dev.off())
+  pdf()
+  plot(...)
+}
+```
+
+g)  Was gibt der folgende Code zurück? Warum? Was bedeuten die drei verschiedenen `c`s in der zweiten Zeile?
+
+```{r, 1g, eval=FALSE}
+c <- 10
+c(c = c)
+```
+10 wird zurückgegeben.
+
+Durch die erste Zeile wird ein Objekt definiert. Dabei wird die Funktion c()
+nicht überschrieben, da R zwischen gleichnamigen Funktionen und Objekten unterscheidet.
+
+Die drei "c"s bedeuten:
+
+1) Funktion c()
+
+2) Elementname "c"
+
+3) Objekt c, das in der ersten Zeile definiert wurde
+
+
